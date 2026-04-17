@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interior Design | be graphics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f0f0f; color: #ffffff; }
+        .active-style { border-color: #f97316; background: rgba(249, 115, 22, 0.1); }
+    </style>
+</head>
+<body class="font-sans">
+    <nav class="p-6 border-b border-zinc-800 flex justify-between items-center">
+        <h1 class="text-xl font-bold italic text-orange-500">be <span class="text-white">graphics</span></h1>
+        <p class="text-xs uppercase tracking-widest text-zinc-500 italic">IA Lab v1.0</p>
+    </nav>
+
+    <main class="max-w-5xl mx-auto p-6 md:py-12">
+        <div class="grid md:grid-cols-2 gap-10">
+            <div class="space-y-6">
+                <h2 class="text-3xl font-light">Transforma tu <span class="font-bold">Sala</span></h2>
+                
+                <div class="space-y-2">
+                    <label class="text-sm text-zinc-400">1. Sube tu foto</label>
+                    <input type="file" id="imageInput" class="w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-zinc-800 file:text-zinc-300 hover:file:bg-zinc-700 transition">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm text-zinc-400">2. Selecciona un estilo</label>
+                    <div class="grid grid-cols-3 gap-3" id="styleSelector">
+                        <button onclick="setStyle('Moderno')" class="p-3 border border-zinc-700 rounded-lg text-sm hover:border-orange-500 transition">Moderno</button>
+                        <button onclick="setStyle('Minimalista')" class="p-3 border border-zinc-700 rounded-lg text-sm hover:border-orange-500 transition">Minimalista</button>
+                        <button onclick="setStyle('Tradicional')" class="p-3 border border-zinc-700 rounded-lg text-sm hover:border-orange-500 transition">Tradicional</button>
+                    </div>
+                </div>
+
+                <button onclick="generateAI()" id="btnGen" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95">
+                    GENERAR COMBINACIÓN
+                </button>
+            </div>
+
+            <div class="relative min-h-[350px] bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden flex items-center justify-center">
+                <img id="resultImage" class="hidden w-full h-full object-cover">
+                <div id="placeholder" class="text-center p-10">
+                    <div id="loader" class="hidden mx-auto mb-4 animate-spin h-10 w-10 border-4 border-orange-500 border-t-transparent rounded-full"></div>
+                    <p class="text-zinc-600 italic">El diseño aparecerá aquí...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let selectedStyle = "Moderno";
+
+        function setStyle(style) {
+            selectedStyle = style;
+            const buttons = document.querySelectorAll('#styleSelector button');
+            buttons.forEach(btn => btn.classList.remove('active-style'));
+            event.target.classList.add('active-style');
+        }
+
+        async function generateAI() {
+            const fileInput = document.getElementById('imageInput');
+            if (!fileInput.files[0]) return alert("Sube una foto primero");
+
+            const btn = document.getElementById('btnGen');
+            const loader = document.getElementById('loader');
+            const placeholderText = document.querySelector('#placeholder p');
+            
+            // UI State Loading
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+            placeholderText.innerText = "La IA está trabajando...";
+
+            // Lógica para conectar con una API (Ej: Hugging Face)
+            // NOTA: Para producción real, aquí pondrías tu API Key.
+            setTimeout(() => {
+                alert("Simulación: Para conectar la IA real necesitas una API Key de Hugging Face o Replicate en el script.");
+                btn.disabled = false;
+                loader.classList.add('hidden');
+                placeholderText.innerText = "El diseño aparecerá aquí...";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
