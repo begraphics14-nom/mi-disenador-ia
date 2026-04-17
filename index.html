@@ -3,84 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Interior Design | be graphics</title>
+    <title>AI Interior Studio | be graphics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #0f0f0f; color: #ffffff; }
-        .active-style { border-color: #f97316; background: rgba(249, 115, 22, 0.1); }
+        body { background: #0a0a0a; color: #eee; }
+        .accent-border { border-color: #f97316; }
+        .selected { background: #f97316 !important; color: white !important; border-color: #f97316; }
     </style>
 </head>
-<body class="font-sans">
-    <nav class="p-6 border-b border-zinc-800 flex justify-between items-center">
-        <h1 class="text-xl font-bold italic text-orange-500">be <span class="text-white">graphics</span></h1>
-        <p class="text-xs uppercase tracking-widest text-zinc-500 italic">IA Lab v1.0</p>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="p-5 border-b border-zinc-900 flex justify-between items-center bg-black">
+        <div class="text-2xl font-black italic tracking-tighter">
+            BE <span class="text-orange-500">GRAPHICS</span> <span class="text-[10px] not-italic font-light text-zinc-500 uppercase tracking-[0.2em] ml-2">AI Interior Lab</span>
+        </div>
     </nav>
 
-    <main class="max-w-5xl mx-auto p-6 md:py-12">
-        <div class="grid md:grid-cols-2 gap-10">
-            <div class="space-y-6">
-                <h2 class="text-3xl font-light">Transforma tu <span class="font-bold">Sala</span></h2>
-                
-                <div class="space-y-2">
-                    <label class="text-sm text-zinc-400">1. Sube tu foto</label>
-                    <input type="file" id="imageInput" class="w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-zinc-800 file:text-zinc-300 hover:file:bg-zinc-700 transition">
+    <main class="flex-grow container mx-auto px-4 py-10 max-w-5xl">
+        <div class="grid lg:grid-cols-2 gap-12">
+            
+            <div class="space-y-8">
+                <div>
+                    <h2 class="text-4xl font-bold mb-2">Reimagina tu sala</h2>
+                    <p class="text-zinc-500">Sube una foto y deja que la IA aplique un nuevo estilo.</p>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-sm text-zinc-400">2. Selecciona un estilo</label>
-                    <div class="grid grid-cols-3 gap-3" id="styleSelector">
-                        <button onclick="setStyle('Moderno')" class="p-3 border border-zinc-700 rounded-lg text-sm hover:border-orange-500 transition">Moderno</button>
-                        <button onclick="setStyle('Minimalista')" class="p-3 border border-zinc-700 rounded-lg text-sm hover:border-orange-500 transition">Minimalista</button>
-                        <button onclick="setStyle('Tradicional')" class="p-3 border border-zinc-700 rounded-lg text-sm hover:border-orange-500 transition">Tradicional</button>
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-zinc-400">1. Selecciona tu foto</label>
+                    <input type="file" id="photo" accept="image/*" class="block w-full text-sm text-zinc-400 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-500 cursor-pointer transition-all">
+                </div>
+
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-zinc-400">2. Elige el estilo de diseño</label>
+                    <div class="grid grid-cols-3 gap-2" id="styleGroup">
+                        <button onclick="selectStyle(this, 'Modern')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-orange-500 transition-all text-sm font-bold uppercase">Moderno</button>
+                        <button onclick="selectStyle(this, 'Minimalist')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-orange-500 transition-all text-sm font-bold uppercase">Minimalista</button>
+                        <button onclick="selectStyle(this, 'Traditional')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-orange-500 transition-all text-sm font-bold uppercase">Tradicional</button>
                     </div>
                 </div>
 
-                <button onclick="generateAI()" id="btnGen" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95">
-                    GENERAR COMBINACIÓN
+                <button onclick="generateDesign()" id="genBtn" class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all shadow-2xl shadow-orange-900/20">
+                    Generar Espacio
                 </button>
             </div>
 
-            <div class="relative min-h-[350px] bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden flex items-center justify-center">
-                <img id="resultImage" class="hidden w-full h-full object-cover">
-                <div id="placeholder" class="text-center p-10">
-                    <div id="loader" class="hidden mx-auto mb-4 animate-spin h-10 w-10 border-4 border-orange-500 border-t-transparent rounded-full"></div>
-                    <p class="text-zinc-600 italic">El diseño aparecerá aquí...</p>
+            <div class="relative group">
+                <div id="loadingOverlay" class="hidden absolute inset-0 bg-black/80 z-10 flex flex-col items-center justify-center rounded-3xl backdrop-blur-sm">
+                    <div class="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p class="text-orange-500 font-bold tracking-widest animate-pulse">RENDERIZANDO...</p>
+                </div>
+                
+                <div class="aspect-square bg-zinc-900 rounded-3xl border-2 border-dashed border-zinc-800 flex items-center justify-center overflow-hidden">
+                    <img id="outputImage" class="hidden w-full h-full object-cover">
+                    <div id="emptyState" class="text-center p-10">
+                        <div class="text-6xl mb-4">🏠</div>
+                        <p class="text-zinc-600 italic">El resultado se mostrará aquí</p>
+                    </div>
                 </div>
             </div>
+
         </div>
     </main>
 
     <script>
-        let selectedStyle = "Moderno";
+        let currentStyle = "";
 
-        function setStyle(style) {
-            selectedStyle = style;
-            const buttons = document.querySelectorAll('#styleSelector button');
-            buttons.forEach(btn => btn.classList.remove('active-style'));
-            event.target.classList.add('active-style');
+        function selectStyle(btn, style) {
+            document.querySelectorAll('#styleGroup button').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            currentStyle = style;
         }
 
-        async function generateAI() {
-            const fileInput = document.getElementById('imageInput');
-            if (!fileInput.files[0]) return alert("Sube una foto primero");
-
-            const btn = document.getElementById('btnGen');
-            const loader = document.getElementById('loader');
-            const placeholderText = document.querySelector('#placeholder p');
+        async function generateDesign() {
+            const photoInput = document.getElementById('photo');
+            const token = "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"; // REEMPLAZA ESTO
+            const btn = document.getElementById('genBtn');
             
-            // UI State Loading
-            btn.disabled = true;
-            loader.classList.remove('hidden');
-            placeholderText.innerText = "La IA está trabajando...";
+            if (!photoInput.files[0] || !currentStyle) {
+                alert("Por favor sube una foto y elige un estilo.");
+                return;
+            }
 
-            // Lógica para conectar con una API (Ej: Hugging Face)
-            // NOTA: Para producción real, aquí pondrías tu API Key.
-            setTimeout(() => {
-                alert("Simulación: Para conectar la IA real necesitas una API Key de Hugging Face o Replicate en el script.");
+            // UI State
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            btn.disabled = true;
+
+            const imageFile = photoInput.files[0];
+            
+            try {
+                // El modelo "Realistic Vision" es increíble para interiores
+                const response = await fetch(
+                    "https://api-inference.huggingface.co/models/SG161222/Realistic_Vision_V6.0_B1_noVAE",
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                        method: "POST",
+                        body: imageFile, // Enviamos la imagen directamente
+                    }
+                );
+
+                if (!response.ok) throw new Error("Error en la API");
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                
+                document.getElementById('outputImage').src = url;
+                document.getElementById('outputImage').classList.remove('hidden');
+                document.getElementById('emptyState').classList.add('hidden');
+            } catch (error) {
+                alert("Hubo un error al generar. Revisa tu Token.");
+                console.error(error);
+            } finally {
+                document.getElementById('loadingOverlay').classList.add('hidden');
                 btn.disabled = false;
-                loader.classList.add('hidden');
-                placeholderText.innerText = "El diseño aparecerá aquí...";
-            }, 2000);
+            }
         }
     </script>
 </body>
